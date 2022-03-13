@@ -10,16 +10,10 @@ import { SuportButton } from '../../components/SuportButton';
 import { format } from 'date-fns'
 
 import firebase from '../../services/firebase';
+import { TaskList } from '../../types';
 
 
-type TaskList = {
-  id: string;
-  created: string | Date;
-  createdFormated?: string;
-  tarefa: string;
-  userId: string;
-  nome: string;
-}
+
 
 interface BoardProps{
   user:{
@@ -149,7 +143,7 @@ export default function Board({ user, data }: BoardProps){
           <div>
             <div>
               <FiCalendar size={20} color="#FFB800"/>
-              <time>{task.createdFormated}</time>
+              <time>{task.createdformated}</time>
             </div>
             <button onClick={()=>{handleEditTask(task)}}>
               <FiEdit2 size={20} color="#FFF" />
