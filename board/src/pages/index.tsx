@@ -4,6 +4,8 @@ import styles from '../styles/styles.module.scss'
 import firebase from '../services/firebase'
 import { useState } from "react"
 
+import ImageHome from '../../public/images/principal.svg'
+
 interface Homeprops{
   data:string
 }
