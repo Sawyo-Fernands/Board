@@ -8,10 +8,9 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    min-height: calc(100vh - 6rem);
 
-    img{
-        margin-top: 5rem;
-    }
+   
 }
 .callToActions{
     max-width: 600px;
@@ -60,7 +59,7 @@
 .donatersTitle{
 
     text-align: center;
-    margin-top: 5rem;
+    margin-top: 1rem;
 }
 
 @media (max-width:690px){
