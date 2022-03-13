@@ -70,6 +70,12 @@ export default function Board({ user, data }: BoardProps){
 
   }
 
+  async function handleDelete(id:string){
+    await firebase.firestore().collection('tarefas').doc(id).delete()
+    
+    setTaskList(taskList.filter(data =>data.id !== id))
+  }
+
   return(
     <>
     <Head>
@@ -109,7 +115,7 @@ export default function Board({ user, data }: BoardProps){
             </button>
           </div>
 
-          <button>
+          <button onClick={()=>{handleDelete(task.id)}}>
             <FiTrash size={20} color="#FF3636" />
             <span>Excluir</span>
           </button>
