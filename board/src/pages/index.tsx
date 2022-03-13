@@ -1,8 +1,26 @@
 import { GetStaticProps } from "next"
 import Head from "next/head"
 import styles from '../styles/styles.module.scss'
+import firebase from '../services/firebase'
+import { useState } from "react"
 
-export default function Home() {
+interface Homeprops{
+  data:string
+}
+
+type Data={
+  id:string,
+  donate:boolean,
+  lastDonate:Date,
+  image:string
+}
+
+export default function Home({ data }:Homeprops) {
+
+  const [donaters,setDonaters]=useState<Data[]>(JSON.parse(data))
+
+
+
   return (
     <>
 
@@ -20,11 +38,20 @@ export default function Home() {
         </p>
       </section>
 
-      <h3 className={styles.donatersTitle}>Apoiadores:</h3>
+      {donaters.length !== 0 && (
+              <h3 className={styles.donatersTitle}>Apoiadores:</h3>
+
+      )}
       <div className={styles.donaters}>
-        
-        <img src="https://sujeitoprogramador.com/steve.png" alt="" />
-       
+
+        {donaters.map(value=>{
+            return(
+              <>
+              <img src={value.image} alt="Doador" key={value.image}/>
+              </>
+            )
+        })}
+
       </div>
     </main>
 
@@ -34,10 +61,18 @@ export default function Home() {
 }
 
 
-export const getStaticProps : GetStaticProps=()=>{
+export const getStaticProps : GetStaticProps=async ()=>{
+
+  const donaters= await firebase.firestore().collection('users').get()
+  let data=JSON.stringify(donaters.docs.map(u =>{
+    return{
+      id:u.id,
+      ...u.data()
+    }
+  }))
   return{
     props:{
-
+      data
     },
     revalidate:60*30 //Atualizar a cada 30 minutos
   }
