@@ -6,18 +6,25 @@ import { useState } from "react";
 import { FiCalendar } from "react-icons/fi";
 
 import firebase from '../../services/firebase';
-import { TaskList } from "../../types";
+
 import styles from './styles.module.scss'
 
 interface TaskListProps{
     data:string
 }
 
+export type TaskList = {
+    id: string;
+    created: string | Date;
+    createdformated?: string;
+    tarefa: string;
+    userId: string;
+    nome: string;
+  }
 
 export default function Task({data}:TaskListProps){
 
     const content=JSON.parse(data) as TaskList
-
 
     return(
       <>
@@ -48,16 +55,17 @@ export const getServerSideProps: GetServerSideProps=async({req,params})=>{
 
     const {id}=params
 
-    if(!session?.id){
-      //Se o user nao tiver logado vamos redirecionar.
+  
+   if(!session?.vip){
+        //Se o user nao for um doador
       return{
         redirect:{
-          destination: '/',
+          destination: '/board',
           permanent: false
         }
       }
-    }
 
+    }
     const data =await firebase.firestore().collection('tarefas').doc(String(id)).get()
     .then((snapshot)=>{
         const data={

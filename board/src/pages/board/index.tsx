@@ -7,10 +7,19 @@ import Link from 'next/link';
 import styles from './styles.module.scss'
 import { FiPlus, FiCalendar, FiEdit2, FiTrash, FiClock, FiX } from 'react-icons/fi'
 import { SuportButton } from '../../components/SuportButton';
-import { format } from 'date-fns'
+import { format, formatDistance } from 'date-fns'
+import { ptBR} from 'date-fns/locale'
 
 import firebase from '../../services/firebase';
-import { TaskList } from '../../types';
+
+export type TaskList = {
+  id: string;
+  created: string | Date;
+  createdFormated?: string;
+  tarefa: string;
+  userId: string;
+  nome: string;
+}
 
 
 
@@ -19,6 +28,8 @@ interface BoardProps{
   user:{
     id: string;
     nome: string;
+    vip:boolean;
+    lastDonate:string | Date
   }
   data: string;
 }
@@ -27,6 +38,7 @@ interface BoardProps{
 export default function Board({ user, data }: BoardProps){
   const [input, setInput] = useState('');
   const [taskList, setTaskList] = useState<TaskList[]>(JSON.parse(data))
+
 
   const [taskEdit,setTaskEdit]=useState<TaskList | null>(null)
 
@@ -143,18 +155,20 @@ export default function Board({ user, data }: BoardProps){
           <div>
             <div>
               <FiCalendar size={20} color="#FFB800"/>
-              <time>{task.createdformated}</time>
+              <time>{task.createdFormated}</time>
             </div>
+            {user.vip && (
             <button onClick={()=>{handleEditTask(task)}}>
               <FiEdit2 size={20} color="#FFF" />
               <span>Editar</span>
-            </button>
+            </button> 
+            )}
           </div>
-
-          <button onClick={()=>{handleDelete(task.id)}}>
-            <FiTrash size={20} color="#FF3636" />
-            <span>Excluir</span>
-          </button>
+                <button onClick={()=>{handleDelete(task.id)}}>
+                <FiTrash size={20} color="#FF3636" />
+                <span>Excluir</span>
+              </button>
+   
         </div>
       </article>
           </>
@@ -164,15 +178,19 @@ export default function Board({ user, data }: BoardProps){
 
     </main>
 
-    <div className={styles.vipContainer}>
-      <h3>Obrigado por apoiar esse projeto.</h3>
-      <div>
-        <FiClock size={28} color="#FFF" />
-        <time>
-          Última doação foi a 3 dias.
-        </time>
-      </div>
-    </div>
+    {
+      user.vip && (
+            <div className={styles.vipContainer}>
+             <h3>Obrigado por apoiar esse projeto.</h3>
+             <div>
+            <FiClock size={28} color="#FFF" />
+             <time>
+             Última doação cerca de {formatDistance(new Date(user.lastDonate),new Date(),{locale:ptBR})}.
+             </time>
+            </div>
+          </div>
+      )
+    }
 
     <SuportButton/>
 
@@ -207,7 +225,9 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
   const user = {
     nome: session?.user.name,
-    id: session?.id
+    id: session?.id,
+    vip:session?.vip,
+    lastDonate:session?.lastDonate
   }
 
 
