@@ -64,7 +64,6 @@ export const getServerSideProps: GetServerSideProps=async({req,params})=>{
           permanent: false
         }
       }
-
     }
     const data =await firebase.firestore().collection('tarefas').doc(String(id)).get()
     .then((snapshot)=>{
@@ -78,7 +77,18 @@ export const getServerSideProps: GetServerSideProps=async({req,params})=>{
         }
 
         return JSON.stringify(data)
+    }).catch(()=>{ 
+        return {}
     })
+
+    if(Object.keys(data).length == 0){
+        return{
+            redirect:{
+              destination: '/board',
+              permanent: false
+            }
+          }
+    }
 
     return{
         props:{
