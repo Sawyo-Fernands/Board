@@ -4,8 +4,42 @@ import {FiPlus,FiCalendar, FiEdit2, FiTrash, FiClock} from 'react-icons/fi'
 import { SuportButton } from '../../components/SuportButton'
 import { GetServerSideProps } from 'next'
 import { getSession } from 'next-auth/client'
+import { ChangeEvent, FormEvent, useState } from 'react'
 
-export default function Board(){
+import firebase from '../../services/firebase'
+
+interface BoardProps{
+    user:{
+        id:string,
+        nome:string
+    }
+}
+
+export default function Board({ user }:BoardProps){
+
+    const[task,setTask]=useState('')
+
+   async function handleAddTask(e:FormEvent){
+        e.preventDefault()
+
+        if(task ==''){
+            alert("Preencha alguma tarefa")
+            return
+        }
+
+        await firebase.firestore().collection('tasks')
+        .add({
+            created:new Date(),
+            tarefa:task,
+            userID:user.id,
+            nome:user.nome
+        }).then(()=>{
+            console.log("Cadastrado com sucesso")
+        }).catch(error=>console.log(error))
+
+
+    }
+
 
     return(
        <>
@@ -15,8 +49,10 @@ export default function Board(){
 
        <main className={styles.container}>
 
-           <form>
-               <input type="text" name="" id="" placeholder='Digite sua tarefa'/>
+           <form onSubmit={handleAddTask}>
+               <input type="text" name="" id="" placeholder='Digite sua tarefa' value={task} onChange={(e:ChangeEvent<HTMLInputElement>)=>{ 
+                   setTask(e.target.value)
+                   }}/>
                 <button type="submit"><FiPlus size={25} color="#17181f"/></button>
            </form>
 
@@ -67,9 +103,13 @@ export const getServerSideProps: GetServerSideProps =async({req})=>{
         }
     }
 
+    const user={
+        nome: session?.user.name,
+        id:session?.id
+    }
     return{
         props:{
-
+            user
         }
     }
 }
